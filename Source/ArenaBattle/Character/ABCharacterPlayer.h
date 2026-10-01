@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/ABCharacterBase.h"
+#include <InputActionValue.h>
 #include "ABCharacterPlayer.generated.h"
 
 // 전방 선언.
@@ -29,10 +30,10 @@ protected:
 
 protected:
 	// 이동 처리 담당 함수.
-	void Move(const FInputActionValue& value);
+	void Move(const FInputActionValue& Value);
 
 	// 회전 처리 담당 함수.
-	void Look(const FInputActionValue& value);
+	void Look(const FInputActionValue& Value);
 
 protected:
 	// 컴포넌트 구성.

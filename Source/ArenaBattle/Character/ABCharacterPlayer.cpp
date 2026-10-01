@@ -146,13 +146,64 @@ void AABCharacterPlayer::SetupPlayerInputComponent(
 			this,
 			&AABCharacterPlayer::Move
 		);
+
+		EnhancedInputComponent->BindAction(
+			LookAction,
+			ETriggerEvent::Triggered,
+			this,
+			&AABCharacterPlayer::Look
+		);
+
+		EnhancedInputComponent->BindAction(
+			JumpAction,
+			ETriggerEvent::Started,
+			this,
+			&ACharacter::Jump
+		);
+
+		EnhancedInputComponent->BindAction(
+			JumpAction,
+			ETriggerEvent::Completed,
+			this,
+			&ACharacter::StopJumping
+		);
 	}
 }
 
-void AABCharacterPlayer::Move(const FInputActionValue& value)
+void AABCharacterPlayer::Move(const FInputActionValue& Value)
 {
+	// 입력 값 읽어오기 ( 입력에 지정된 타입으로 변환 ).
+	FVector2D Movement = Value.Get<FVector2D>();
+
+	// 이동할 방향 만들기.
+	// 카메라가 바라보는 방향(=컨트롤러가 바라보는 방향)을 기준으로 방향 만들기.
+
+	// 방향을 구하기 위해서는 회전(오리엔테이션)을 먼저 구해야 함.
+	// FRotator는 오일러(Euler) 회전을 표기하는데 사용됨.
+	// 오일러 회전은 X축으로 몇도, Y축으로 몇도, Z축으로 몇도를 직관적으로 표기.
+	FRotator Rotation = GetControlRotation();
+	FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
+
+	// 앞방향.
+	// 회전 행렬을 구하고, 거기에서 앞방향 성분을 추출.
+	FVector ForwardVector 
+		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	// 오른쪽 방향.
+	FVector RightVector
+		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	// 무브먼트 컴포넌트에 입력 전달.
+	AddMovementInput(ForwardVector, Movement.Y);
+	AddMovementInput(RightVector, Movement.X);
 }
 
-void AABCharacterPlayer::Look(const FInputActionValue & value)
+void AABCharacterPlayer::Look(const FInputActionValue & Value)
 {
+	// 입력 값 읽어오기 ( 입력에 지정된 타입으로 변환 ).
+	FVector2D RotationValue = Value.Get<FVector2D>();
+
+	// 회전 처리 -> 컨트롤러에 회전 입력 전달.
+	AddControllerYawInput(RotationValue.X);
+	AddControllerPitchInput(RotationValue.Y);
 }
