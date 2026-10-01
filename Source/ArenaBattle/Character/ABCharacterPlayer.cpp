@@ -6,6 +6,12 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Camera/CameraComponent.h>
 
+#include <InputMappingContext.h>
+#include <InputAction.h>
+
+#include <EnhancedInputSubsystems.h>
+#include <EnhancedInputComponent.h>
+
 AABCharacterPlayer::AABCharacterPlayer()
 {
 	// 회전 속성 설정.
@@ -62,11 +68,91 @@ AABCharacterPlayer::AABCharacterPlayer()
 	{
 		GetMesh()->SetAnimInstanceClass(CharacterAnim.Class);
 	}
+
+	// 입력 관련 애셋 로드 및 설정.
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextRef(
+		TEXT("/Game/ArenaBattle/Input/IMC_Default.IMC_Default")
+	);
+
+	if (DefaultMappingContextRef.Succeeded())
+	{
+		DefaultMappingContext = DefaultMappingContextRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(
+		TEXT("/Game/ArenaBattle/Input/Actions/IA_Move.IA_Move")
+	);
+
+	if (MoveActionRef.Succeeded())
+	{
+		MoveAction = MoveActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionRef(
+		TEXT("/Game/ArenaBattle/Input/Actions/IA_Look.IA_Look")
+	);
+
+	if (LookActionRef.Succeeded())
+	{
+		LookAction = LookActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionRef(
+		TEXT("/Game/ArenaBattle/Input/Actions/IA_Jump.IA_Jump")
+	);
+
+	if (JumpActionRef.Succeeded())
+	{
+		JumpAction = JumpActionRef.Object;
+	}
 }
 
 void AABCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 사용할 입력 매핑 컨텍스트 설정.
+	// 플레이어 컨트롤러 가져오기.
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (IsValid(PlayerController))
+	{
+		// 향상된 입력 서브 시스템 가져오기.
+		UEnhancedInputLocalPlayerSubsystem* InputSystem 
+			= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			PlayerController->GetLocalPlayer()
+		);
 
+		if (InputSystem)
+		{
+			InputSystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
+
+void AABCharacterPlayer::SetupPlayerInputComponent(
+	UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// 바인딩 - 입력 액션을 통해서 입력이 전달될 때 실행함 함수 연동.
+	// 향상된 입력 컴포넌트로 변환.
+	UEnhancedInputComponent* EnhancedInputComponent
+		= Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent)
+	{
+		EnhancedInputComponent->BindAction(
+			MoveAction,
+			ETriggerEvent::Triggered,
+			this,
+			&AABCharacterPlayer::Move
+		);
+	}
+}
+
+void AABCharacterPlayer::Move(const FInputActionValue& value)
+{
+}
+
+void AABCharacterPlayer::Look(const FInputActionValue & value)
+{
 }
