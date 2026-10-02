@@ -50,7 +50,7 @@ AABCharacterPlayer::AABCharacterPlayer()
 
 	// 메시 애셋 지정.
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(
-		TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple")
+		TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard")
 	);
 
 	// 애셋 로드에 성공하면 스켈레탈 메시 설정.
@@ -62,7 +62,7 @@ AABCharacterPlayer::AABCharacterPlayer()
 	// 애님 블루프린트 클래스 검색 및 설정.
 	// /Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.ABP_Unarmed
 	static ConstructorHelpers::FClassFinder<UAnimInstance> CharacterAnim(
-		TEXT("/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.ABP_Unarmed_C")
+		TEXT("/Game/ArenaBattle/Animation/ABP_ABCharacter.ABP_ABCharacter_C")
 	);
 
 	// 검색에 성공하면 클래스 정보 설정.
