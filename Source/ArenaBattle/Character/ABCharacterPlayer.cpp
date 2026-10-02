@@ -212,6 +212,10 @@ void AABCharacterPlayer::SetCharacterControl(
 
 		if (InputSystem)
 		{
+			// 기존 설정된 입력 매핑 컨텍스트 제거.
+			InputSystem->ClearAllMappings();
+
+			// 새로운 매핑 컨텍스트 적용.
 			InputSystem->AddMappingContext(
 				NewCharacterControl->InputMappingContext, 
 				0
