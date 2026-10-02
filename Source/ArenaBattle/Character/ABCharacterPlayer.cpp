@@ -169,6 +169,20 @@ void AABCharacterPlayer::SetupPlayerInputComponent(
 			this,
 			&ACharacter::StopJumping
 		);
+
+		EnhancedInputComponent->BindAction(
+			QuaterMoveAction,
+			ETriggerEvent::Triggered,
+			this,
+			&AABCharacterPlayer::QuaterMove
+		);
+
+		EnhancedInputComponent->BindAction(
+			ChangeControlAction,
+			ETriggerEvent::Started,
+			this,
+			&AABCharacterPlayer::ChangeCharacterControl
+		);
 	}
 }
 
@@ -204,12 +218,24 @@ void AABCharacterPlayer::SetCharacterControl(
 			);
 		}
 	}
+
+	// 변경된 캐릭터 컨트롤 열거형 설정.
+	CurrentCharacterControlType = NewCharacterControlType;
 }
 
 void AABCharacterPlayer::SetCharacterControlData(
 	const UABCharacterControlData* InCharacterControlData)
 {
+	Super::SetCharacterControlData(InCharacterControlData);
 
+	SpringArm->TargetArmLength = InCharacterControlData->TargetArmLength;
+	SpringArm->SetRelativeRotation(InCharacterControlData->RelativeRotation);
+	SpringArm->bDoCollisionTest = InCharacterControlData->bDoCollisionTest;
+	SpringArm->bUsePawnControlRotation 
+		= InCharacterControlData->bUsePawnControlRotation;
+	SpringArm->bInheritPitch = InCharacterControlData->bInheritPitch;
+	SpringArm->bInheritYaw = InCharacterControlData->bInheritYaw;
+	SpringArm->bInheritRoll = InCharacterControlData->bInheritRoll;
 }
 
 void AABCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
@@ -252,8 +278,41 @@ void AABCharacterPlayer::ShoulderLook(const FInputActionValue & Value)
 
 void AABCharacterPlayer::QuaterMove(const FInputActionValue& Value)
 {
+	// 입력 값 가져오기.
+	FVector2D MovementValue = Value.Get<FVector2D>();
+
+	// 입력 값을 기반으로 이동 방향 구하기.
+	FVector MoveDirection(MovementValue.Y, MovementValue.X, 0.0f);
+	// 이동 방향으로 사용하기 위해 정규화(단위 벡터) 처리.
+	// 대각선 이동이 더 빠른데 이걸 방지학 위해.
+	MoveDirection.Normalize();
+
+	// 입력 스케일 값.
+	float MovementScale = FMath::Min(1.0f, MovementValue.Size());
+
+	// 컨트롤러 회전 설정.
+	// MakeFromX: 전달된 X벡터(앞방향) 벡터를 기반으로
+	// 회전(오리엔테이션) 행렬을 생성하는 함수.
+	// 외적 - A x B = |A|x|B|xSin(Theta)
+	// Theta: 두 벡터 사이의 각.
+	Controller->SetControlRotation(
+		FRotationMatrix::MakeFromX(MoveDirection).Rotator()
+	);
+
+	// 이동 적용.
+	AddMovementInput(MoveDirection, MovementScale);
 }
 
 void AABCharacterPlayer::ChangeCharacterControl()
 {
+	// 현재 설정된 열거형에 따라 다음 컨트롤을 선택.
+	if (CurrentCharacterControlType == ECharacterControlType::Shoulder)
+	{
+		SetCharacterControl(ECharacterControlType::Quater);
+	}
+
+	else if (CurrentCharacterControlType == ECharacterControlType::Quater)
+	{
+		SetCharacterControl(ECharacterControlType::Shoulder);
+	}
 }
