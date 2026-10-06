@@ -27,6 +27,14 @@ public:
 	AABCharacterBase();
 
 protected:
+	// 액터가 대미지를 받았을 때 호출되는 함수 (Actor에서 파생됨).
+	virtual float TakeDamage(
+		float DamageAmount, 
+		struct FDamageEvent const& DamageEvent, 
+		class AController* EventInstigator, 
+		AActor* DamageCauser) override;
+
+protected:
 
 	// 컨트롤 데이터 설정.
 	virtual void SetCharacterControlData(

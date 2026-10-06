@@ -12,7 +12,7 @@
 // Sets default values
 AABCharacterBase::AABCharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 맵(TMap) 설정.
@@ -39,6 +39,47 @@ AABCharacterBase::AABCharacterBase()
 			QuaterDataRef.Object
 		);
 	}
+
+	// 콜리전 설정.
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_ABCAPSULE);
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+
+	// 몽타주 및 콤보 액션 데이터 애셋 지정.
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(
+		TEXT("/Game/ArenaBattle/Animation/AM_ComboAttack.AM_ComboAttack")
+	);
+
+	if (ComboActionMontageRef.Succeeded())
+	{
+		ComboAttackMontage = ComboActionMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(
+		TEXT("/Game/ArenaBattle/ComboData/ABA_ComboAction.ABA_ComboAction")
+	);
+
+	if (ComboActionDataRef.Succeeded())
+	{
+		ComboActionData = ComboActionDataRef.Object;
+	}
+}
+
+float AABCharacterBase::TakeDamage(
+	float DamageAmount,
+	FDamageEvent const& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(
+		DamageAmount, 
+		DamageEvent, 
+		EventInstigator, 
+		DamageCauser
+	);
+
+	// Todo: 대미지를 받으면 죽음 처리 함수 호출.
+
+	return DamageAmount;
 }
 
 void AABCharacterBase::SetCharacterControlData(
@@ -47,13 +88,13 @@ void AABCharacterBase::SetCharacterControlData(
 	// 데이터에서 속성을 가져와서 필요한 곳에 설정.
 
 	// Pawn 설정.
-	bUseControllerRotationYaw 
+	bUseControllerRotationYaw
 		= InCharacterControlData->bUseControllerRotationYaw;
 
 	// 캐릭터 무브먼트 설정.
 	GetCharacterMovement()->bUseControllerDesiredRotation
 		= InCharacterControlData->bUseControllerDesiredRotation;
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement
 		= InCharacterControlData->bUseOrientToMovement;
 
@@ -202,16 +243,6 @@ void AABCharacterBase::ComboCheck()
 void AABCharacterBase::AttackHitCheck()
 {
 	// 트레이스를 활용한 충돌 확인.
-	/*
-	* struct FHitResult& OutHit, 
-	  const FVector& Start, 
-	  const FVector& End, 
-	  const FQuat& Rot, 
-	  ECollisionChannel TraceChannel, 
-	  const FCollisionShape& CollisionShape, 
-	  const FCollisionQueryParams& Params = FCollisionQueryParams::DefaultQueryParam , 
-	  const FCollisionResponseParams& ResponseParam  = FCollisionResponseParams::DefaultResponseParam 
-	*/
 
 	// 콜리전 쿼리 파라미터.
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
@@ -259,4 +290,31 @@ void AABCharacterBase::AttackHitCheck()
 			this
 		);
 	}
+
+	// 시각적으로 충돌 여부를 확인할 수 있도록 디버깅 기능 활용.
+#if ENABLE_DRAW_DEBUG
+
+	// 캡슐의 중심 위치.
+	// (End - Start): Start위치에서 End위치로 향하는 벡터.
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+
+	// 캡슐 높이의 절반.
+	const float CapsuleHalfHeight = AttackRange * 0.5f;
+
+	// 표시할 색상 ( 맞았으면 빨간색, 안 맞았으면 녹색 ).
+	const FColor DrawColor = HitDetected ? FColor::Red : FColor::Green;
+
+	// 캡슐 그리기.
+	DrawDebugCapsule(
+		GetWorld(),
+		CapsuleOrigin,
+		CapsuleHalfHeight,
+		AttackRadius,
+		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+		DrawColor,
+		false,
+		5.0f
+	);
+
+#endif
 }
