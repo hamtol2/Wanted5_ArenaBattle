@@ -50,6 +50,9 @@ protected:
 	// V키에 대응해서 실행할 함수.
 	void ChangeCharacterControl();
 
+	// 공격 입력에 대응되어 실행될 공격 함수.
+	void Attack();
+
 protected:
 	// 컴포넌트 구성.
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -79,6 +82,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = Input, BlueprintReadOnly)
 	TObjectPtr<UInputAction> ChangeControlAction;
+
+	// 공격 입력 액션.
+	UPROPERTY(VisibleAnywhere, Category = Input, BlueprintReadOnly)
+	TObjectPtr<UInputAction> AttackAction;
 
 	// 현재 사용 중인 컨트롤 타입을 추적(저장)하는 변수.
 	UPROPERTY(VisibleAnywhere, Category = CharacterControl)
