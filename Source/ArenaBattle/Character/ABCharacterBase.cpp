@@ -116,6 +116,12 @@ void AABCharacterBase::ComboActionBegin()
 void AABCharacterBase::ComboActionEnded(
 	UAnimMontage* TargetMontage, bool bInterrupted)
 {
+	// 확인.
+	ensureAlways(CurrentCombo > 0);
+
+	// 콤보 단계 초기화.
+	CurrentCombo = 0;
+
 	// 몽타주 재생이 종료되면 캐릭터 이동 복구.
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
