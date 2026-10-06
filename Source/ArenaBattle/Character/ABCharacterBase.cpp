@@ -5,6 +5,9 @@
 #include "ABCharacterControlData.h"
 #include "ABComboActionData.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Components/CapsuleComponent.h>
+#include <Physics/ABCollision.h>
+#include <Engine/DamageEvents.h>
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -193,5 +196,67 @@ void AABCharacterBase::ComboCheck()
 			// 콤보 처리에 사용한 값 초기화.
 			bHasNextComboCommand = false;
 		}
+	}
+}
+
+void AABCharacterBase::AttackHitCheck()
+{
+	// 트레이스를 활용한 충돌 확인.
+	/*
+	* struct FHitResult& OutHit, 
+	  const FVector& Start, 
+	  const FVector& End, 
+	  const FQuat& Rot, 
+	  ECollisionChannel TraceChannel, 
+	  const FCollisionShape& CollisionShape, 
+	  const FCollisionQueryParams& Params = FCollisionQueryParams::DefaultQueryParam , 
+	  const FCollisionResponseParams& ResponseParam  = FCollisionResponseParams::DefaultResponseParam 
+	*/
+
+	// 콜리전 쿼리 파라미터.
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	// 공격 범위.
+	const float AttackRange = 40.0f;
+
+	// 트레이스에 사용할 구체의 반지름.
+	const float AttackRadius = 50.0f;
+
+	// 트레이스 시작 위치.
+	// 액터의 위치 + 캡슐 높이의 반지름 만큼 앞으로 떨어진 위치.
+	FVector Start = GetActorLocation() +
+		GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+	// 트레이스 종료 위치.
+	// 시작위치 + 공격 범위 만큼 앞으로 떨어진 위치.
+	FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	FHitResult OutHitResult;
+	bool HitDetected = GetWorld()->SweepSingleByChannel(
+		OutHitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		CCHANNEL_ABACTION,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params
+	);
+
+	// 충돌이 감지되면 대미지 전달.
+	if (HitDetected)
+	{
+		// 전달할 대미지.
+		const float AttackDamage = 30.0f;
+
+		// 대미지 이벤트 변수.
+		FDamageEvent DamageEvent;
+
+		// TakeDamage 함수를 호출해서 대미지 전달.
+		OutHitResult.GetActor()->TakeDamage(
+			AttackDamage,
+			DamageEvent,
+			GetController(),
+			this
+		);
 	}
 }
