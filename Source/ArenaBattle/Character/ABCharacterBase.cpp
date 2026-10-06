@@ -62,6 +62,17 @@ AABCharacterBase::AABCharacterBase()
 	{
 		ComboActionData = ComboActionDataRef.Object;
 	}
+
+	// 죽음 몽타주 애셋 바인딩.
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(
+		TEXT("/Game/ArenaBattle/Animation/AM_Dead.AM_Dead")
+	);
+
+	if (DeadMontageRef.Succeeded())
+	{
+		DeadMontage = DeadMontageRef.Object;
+	}
+
 }
 
 float AABCharacterBase::TakeDamage(
@@ -77,9 +88,36 @@ float AABCharacterBase::TakeDamage(
 		DamageCauser
 	);
 
-	// Todo: 대미지를 받으면 죽음 처리 함수 호출.
+	// 대미지를 받으면 죽음 처리 함수 호출.
+	SetDead();
 
 	return DamageAmount;
+}
+
+void AABCharacterBase::SetDead()
+{
+	// 움직이지 않도록 처리.
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	// 죽는 모션 재생.
+	PlayDeadAnimation();
+
+	// 콜리전 끄기.
+	SetActorEnableCollision(false);
+}
+
+void AABCharacterBase::PlayDeadAnimation()
+{
+	// 애님 인스턴스를 통해서 죽음 몽타주 재생.
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		// 현재 재생 중인 모든 몽타주 중지.
+		AnimInstance->StopAllMontages(0.0f);
+
+		// 재생.
+		AnimInstance->Montage_Play(DeadMontage, 1.0f);
+	}
 }
 
 void AABCharacterBase::SetCharacterControlData(

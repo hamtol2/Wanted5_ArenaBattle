@@ -34,6 +34,14 @@ protected:
 		class AController* EventInstigator, 
 		AActor* DamageCauser) override;
 
+	// Dead 처리.
+protected:
+	// 죽음 설정 함수.
+	virtual void SetDead();
+
+	// 죽는 애니메이션 재생 함수.
+	void PlayDeadAnimation();
+
 protected:
 
 	// 컨트롤 데이터 설정.
@@ -57,6 +65,9 @@ protected:
 	// 콤보 타이밍 처리 함수.
 	// 설정된 시간 이전에 입력이 제대로 들어왔는지 확인하는데 사용.
 	void ComboCheck();
+
+	// 공격 감지(판정) 함수.
+	virtual void AttackHitCheck() override;
 
 protected:
 	// 컨트롤 타입별로 컨트롤 데이터를 관리하기 위한 맵.
@@ -82,6 +93,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Attack)
 	bool bHasNextComboCommand = false;
 
-	// 공격 감지(판정) 함수.
-	virtual void AttackHitCheck() override;
+	// 죽음 애니메이션 몽타주 애셋.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	// 죽은 뒤에 약간의 시간을 대기(딜레이)한 후 삭제.
+	float DeadEventDelayTime = 5.0f;
 };
