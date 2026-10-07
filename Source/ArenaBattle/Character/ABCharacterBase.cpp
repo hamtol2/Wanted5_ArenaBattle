@@ -9,6 +9,9 @@
 #include <Physics/ABCollision.h>
 #include <Engine/DamageEvents.h>
 
+#include <CharacterStat/ABCharacterStatComponent.h>
+#include <Components/WidgetComponent.h>
+
 // Sets default values
 AABCharacterBase::AABCharacterBase()
 {
@@ -73,6 +76,39 @@ AABCharacterBase::AABCharacterBase()
 		DeadMontage = DeadMontageRef.Object;
 	}
 
+	// 스탯/위젯 컴포넌트 생성 및 설정.
+	// 액터가 컴포넌트를 가지는 형태를 "컴포지션(Composition)" 이라고 함.
+
+	// 스텟 컴포넌트 생성(액터 컴포넌트이기 때문에 계층 설정 불필요).
+	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
+
+	// 위젯 컴포넌트 생성.
+	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+
+	// 위젯 컴포넌트는 씬 컴포넌트(트랜스폼을 가지는)이기 때문에 계층 설정 필요함.
+	HpBar->SetupAttachment(GetMesh());
+	// 캐릭터 머리 위에 보일 수 있도록 Z 위치 조정.
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+
+	// 위젯 설정.
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(
+		TEXT("/Game/ArenaBattle/UI/WBP_HPBar.WBP_HPBar_C")
+	);
+
+	if (HpBarWidgetRef.Succeeded())
+	{
+		// 생성할 위젯 클래스 설정(타입 설정).
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+
+		// UI가 그려질 공간 설정(화면 공간).
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+
+		// UI가 그려질 크기 설정.
+		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
+
+		// 콜리전 끄기.
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 float AABCharacterBase::TakeDamage(
