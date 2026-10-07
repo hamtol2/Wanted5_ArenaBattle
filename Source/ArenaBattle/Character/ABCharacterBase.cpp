@@ -10,7 +10,7 @@
 #include <Engine/DamageEvents.h>
 
 #include <CharacterStat/ABCharacterStatComponent.h>
-#include <Components/WidgetComponent.h>
+#include <UI/ABWidgetComponent.h>
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -83,7 +83,7 @@ AABCharacterBase::AABCharacterBase()
 	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
 
 	// 위젯 컴포넌트 생성.
-	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	HpBar = CreateDefaultSubobject<UABWidgetComponent>(TEXT("Widget"));
 
 	// 위젯 컴포넌트는 씬 컴포넌트(트랜스폼을 가지는)이기 때문에 계층 설정 필요함.
 	HpBar->SetupAttachment(GetMesh());
@@ -91,6 +91,7 @@ AABCharacterBase::AABCharacterBase()
 	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
 
 	// 위젯 설정.
+	// WBP_HPBar -> UABHpBarWidget -> UABUserWidget -> UUserWidget..
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(
 		TEXT("/Game/ArenaBattle/UI/WBP_HPBar.WBP_HPBar_C")
 	);

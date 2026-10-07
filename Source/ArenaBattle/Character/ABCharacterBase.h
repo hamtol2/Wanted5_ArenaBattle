@@ -107,5 +107,5 @@ protected:
 
 	// 위젯 컴포넌트.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UWidgetComponent> HpBar;
+	TObjectPtr<class UABWidgetComponent> HpBar;
 };
