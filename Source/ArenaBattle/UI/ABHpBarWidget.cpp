@@ -3,6 +3,7 @@
 
 #include "UI/ABHpBarWidget.h"
 #include <Components/ProgressBar.h>
+#include <Interface/ABCharacterWidgetInterface.h>
 
 UABHpBarWidget::UABHpBarWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -34,4 +35,12 @@ void UABHpBarWidget::NativeConstruct()
 	// 이름 값을 사용해 위젯 참조 가져오기.
 	HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PbHpBar")));
 	ensure(HpProgressBar);
+
+	// 인터페이스를 통해서 이 위젯의 함수에 Stat 컴포넌트의 델리게이트 등록 요청.
+	IABCharacterWidgetInterface* CharacterWidgetInterface 
+		= Cast<IABCharacterWidgetInterface>(OwningActor);
+	if (CharacterWidgetInterface)
+	{
+		CharacterWidgetInterface->SetupCharacterWidget(this);
+	}
 }
