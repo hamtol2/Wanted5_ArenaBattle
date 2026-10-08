@@ -207,7 +207,15 @@ void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 		= Cast<UABWeaponItemData>(InItemData);
 	if (WeaponItemData)
 	{
-		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh);
+		// 무기 메시가 로딩되기 전이라면 애셋 로드.
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			// 확실하게 로드하기 위해 동기 방식으로 로드.
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+
+		//Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh);
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
 	}
 }
 

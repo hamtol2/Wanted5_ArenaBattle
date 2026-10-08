@@ -71,7 +71,7 @@ void AABItemBox::OnOverlapBegin(
 	bool bFromSweep, 
 	const FHitResult& SweepResult)
 {
-	// 유효성 검사.
+	// 유효성 검사 -> 꽝.
 	if (!Item)
 	{
 		Destroy();

@@ -17,5 +17,6 @@ class ARENABATTLE_API UABWeaponItemData : public UABItemData
 public:
 	// 제공할 무기에 대한 스켈레탈 메시 애샛 변수.
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	TObjectPtr<USkeletalMesh> WeaponMesh;
+	//TObjectPtr<class USkeletalMesh> WeaponMesh;
+	TSoftObjectPtr<class USkeletalMesh> WeaponMesh;
 };
