@@ -6,7 +6,14 @@
 #include "GameFramework/Character.h"
 #include <Interface/ABAnimationAttackInterface.h>
 #include <Interface/ABCharacterWidgetInterface.h>
+#include <Interface/ABCharacterItemInterface.h>
 #include "ABCharacterBase.generated.h"
+
+// 로그 카테고리 추가.
+DECLARE_LOG_CATEGORY_EXTERN(LogABCharacter, Log, All);
+
+// 아이템 획득 처리에 사용할 델리게이트 선언.
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UABItemData* /*InItemData*/);
 
 // 입력 컨트롤을 관리하기 위한 열거형.
 UENUM()
@@ -20,7 +27,8 @@ UCLASS()
 class ARENABATTLE_API AABCharacterBase 
 	: public ACharacter, 
 	public IABAnimationAttackInterface,
-	public IABCharacterWidgetInterface
+	public IABCharacterWidgetInterface,
+	public IABCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +48,14 @@ protected:
 		struct FDamageEvent const& DamageEvent, 
 		class AController* EventInstigator, 
 		AActor* DamageCauser) override;
+
+	// 아이템을 수집했을 때 호출될 함수.
+	virtual void TakeItem(class UABItemData* InItemData) override;
+
+	// 아이템 종류를 구분해서 수집을 처리할 함수.
+	virtual void DrinkPotion(class UABItemData* InItemData);
+	virtual void EquipWeapon(class UABItemData* InItemData);
+	virtual void ReadScroll(class UABItemData* InItemData);
 
 	// Dead 처리.
 protected:
@@ -118,4 +134,7 @@ protected:
 	// 위젯 컴포넌트.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABWidgetComponent> HpBar;
+
+	// 아이템 수집처리에 사용할 델리게이트 배열.
+	TArray<FOnTakeItemDelegate> TakeItemActions;
 };

@@ -44,4 +44,8 @@ protected:
 	// 파티클 컴포넌트.
 	UPROPERTY(VisibleAnywhere, Category = Box)
 	TObjectPtr<class UParticleSystemComponent> Effect;
+
+	// 아이템 정보.
+	UPROPERTY(EditAnywhere, Category = Item)
+	TObjectPtr<class UABItemData> Item;
 };

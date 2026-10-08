@@ -2,10 +2,12 @@
 
 
 #include "Item/ABItemBox.h"
+#include <Physics/ABCollision.h>
+#include <Interface/ABCharacterItemInterface.h>
+
 #include <Components/BoxComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <Particles/ParticleSystemComponent.h>
-#include <Physics/ABCollision.h>
 
 // Sets default values
 AABItemBox::AABItemBox()
@@ -69,6 +71,21 @@ void AABItemBox::OnOverlapBegin(
 	bool bFromSweep, 
 	const FHitResult& SweepResult)
 {
+	// 유효성 검사.
+	if (!Item)
+	{
+		Destroy();
+		return;
+	}
+
+	// 아이템 수집 처리를 위해 인터페이스를 통한 전달.
+	IABCharacterItemInterface* OverlappingPawn 
+		= Cast<IABCharacterItemInterface>(OtherActor);
+	if (OverlappingPawn)
+	{
+		OverlappingPawn->TakeItem(Item);
+	}
+
 	// 파티클 재생.
 	Effect->Activate();
 

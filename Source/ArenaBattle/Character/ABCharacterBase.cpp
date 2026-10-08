@@ -4,14 +4,18 @@
 #include "Character/ABCharacterBase.h"
 #include "ABCharacterControlData.h"
 #include "ABComboActionData.h"
-#include <GameFramework/CharacterMovementComponent.h>
-#include <Components/CapsuleComponent.h>
-#include <Physics/ABCollision.h>
-#include <Engine/DamageEvents.h>
-
 #include <CharacterStat/ABCharacterStatComponent.h>
 #include <UI/ABWidgetComponent.h>
 #include <UI/ABHpBarWidget.h>
+#include <Physics/ABCollision.h>
+#include <Item/ABItemData.h>
+
+#include <GameFramework/CharacterMovementComponent.h>
+#include <Components/CapsuleComponent.h>
+#include <Engine/DamageEvents.h>
+
+// 커스텀 로그 카테고리 정의.
+DEFINE_LOG_CATEGORY(LogABCharacter);
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -111,6 +115,31 @@ AABCharacterBase::AABCharacterBase()
 		// 콜리전 끄기.
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	// 아이템 종류별로 실행할 처리 로직(함수)을 델리게이트 배열에 추가.
+	/*
+	* Weapon = 0, Potion, Scroll
+	*/
+	TakeItemActions.Add(
+		FOnTakeItemDelegate::CreateUObject(
+			this, 
+			&AABCharacterBase::EquipWeapon
+		)
+	);
+
+	TakeItemActions.Add(
+		FOnTakeItemDelegate::CreateUObject(
+			this,
+			&AABCharacterBase::DrinkPotion
+		)
+	);
+
+	TakeItemActions.Add(
+		FOnTakeItemDelegate::CreateUObject(
+			this,
+			&AABCharacterBase::ReadScroll
+		)
+	);
 }
 
 void AABCharacterBase::PostInitializeComponents()
@@ -128,20 +157,49 @@ float AABCharacterBase::TakeDamage(
 	AActor* DamageCauser)
 {
 	float ActualDamage = Super::TakeDamage(
-		DamageAmount, 
-		DamageEvent, 
-		EventInstigator, 
+		DamageAmount,
+		DamageEvent,
+		EventInstigator,
 		DamageCauser
 	);
 
 	// 대미지를 받으면 죽음 처리 함수 호출.
 	//SetDead();
-	
+
 	// 전달 받은 대미지를 스탯 컴포넌트에 전달.
 	// 대미지 적용.
 	Stat->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
+}
+
+void AABCharacterBase::TakeItem(UABItemData* InItemData)
+{
+	// 아이템 유효성 확인.
+	if (InItemData)
+	{
+		// 아이템 인덱스.
+		uint8 ItemIndex = (uint8)InItemData->Type;
+
+		// 델리게이트를 통해서 함수 호출.
+		TakeItemActions[ItemIndex].ExecuteIfBound(InItemData);
+	}
+}
+
+void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
+{
+	// 로그 출력.
+	UE_LOG(LogABCharacter, Log, TEXT("Drink Potion"));
+}
+
+void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
+{
+	UE_LOG(LogABCharacter, Log, TEXT("Equip Weapon"));
+}
+
+void AABCharacterBase::ReadScroll(UABItemData* InItemData)
+{
+	UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
 }
 
 void AABCharacterBase::SetDead()
