@@ -135,6 +135,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UABWidgetComponent> HpBar;
 
+	// 무기 아이템 획득 시 사용할 스켈레탈 메시 컴포넌트.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon;
+
 	// 아이템 수집처리에 사용할 델리게이트 배열.
 	TArray<FOnTakeItemDelegate> TakeItemActions;
 };

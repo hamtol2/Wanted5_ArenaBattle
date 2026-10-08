@@ -9,10 +9,12 @@
 #include <UI/ABHpBarWidget.h>
 #include <Physics/ABCollision.h>
 #include <Item/ABItemData.h>
+#include <Item/ABWeaponItemData.h>
 
 #include <GameFramework/CharacterMovementComponent.h>
-#include <Components/CapsuleComponent.h>
 #include <Engine/DamageEvents.h>
+#include <Components/CapsuleComponent.h>
+#include <Components/SkeletalMeshComponent.h>
 
 // 커스텀 로그 카테고리 정의.
 DEFINE_LOG_CATEGORY(LogABCharacter);
@@ -140,6 +142,10 @@ AABCharacterBase::AABCharacterBase()
 			&AABCharacterBase::ReadScroll
 		)
 	);
+
+	// 스켈레탈 메시 컴포넌트 생성.
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void AABCharacterBase::PostInitializeComponents()
@@ -194,7 +200,15 @@ void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
 
 void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 {
-	UE_LOG(LogABCharacter, Log, TEXT("Equip Weapon"));
+	//UE_LOG(LogABCharacter, Log, TEXT("Equip Weapon"));
+
+	// 수집한 아이템으로부터 무기 스켈레탈 메시 애셋을 불러와 설정.
+	UABWeaponItemData* WeaponItemData 
+		= Cast<UABWeaponItemData>(InItemData);
+	if (WeaponItemData)
+	{
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh);
+	}
 }
 
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
