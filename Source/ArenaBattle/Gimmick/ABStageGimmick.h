@@ -6,6 +6,19 @@
 #include "GameFramework/Actor.h"
 #include "ABStageGimmick.generated.h"
 
+// 스테이지 상태를 나타내는 열거형 선언.
+UENUM(BlueprintType)
+enum class EStageState : uint8
+{
+	Ready = 0,
+	Fight,
+	Reward,
+	Next
+};
+
+// 상태에 따른 처리를 위해 델리게이트 선언.
+DECLARE_DELEGATE(FOnStageChangedDelegate);
+
 UCLASS()
 class ARENABATTLE_API AABStageGimmick : public AActor
 {
@@ -56,4 +69,23 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
+
+	// 스테이지.
+protected:
+	// 현재 상태를 나타내는 열거형 선언.
+	UPROPERTY(EditAnywhere, Category = Stage, meta = (AllowPrivateAccess = "true"))
+	EStageState CurrentState;
+
+	// 새로운 상태를 설정할 때 사용할 함수.
+	void SetState(EStageState InNewState);
+
+	// 상태에 따른 처리 분리를 위해 열거형-델리게이트 조합으로 관리.
+	UPROPERTY()
+	TMap<EStageState, FOnStageChangedDelegate> StateChangeActions;
+
+	// 상태 변경에 따른 처리 함수.
+	void SetReady();
+	void SetFight();
+	void SetChooseReward();
+	void SetChooseNext();
 };

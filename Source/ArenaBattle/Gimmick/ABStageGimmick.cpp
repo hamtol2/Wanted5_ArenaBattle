@@ -92,6 +92,38 @@ AABStageGimmick::AABStageGimmick()
 		// 배열에 추가.
 		GateTriggers.Add(GateTrigger);
 	}
+
+	// 시작 상태 설정.
+	CurrentState = EStageState::Ready;
+
+	// 상태에 따른 로직 분기를 위한 델리게이트 맵 구성.
+	StateChangeActions.Add(
+		EStageState::Ready,
+		FOnStageChangedDelegate::CreateUObject(
+			this, &AABStageGimmick::SetReady
+		)
+	);
+
+	StateChangeActions.Add(
+		EStageState::Fight,
+		FOnStageChangedDelegate::CreateUObject(
+			this, &AABStageGimmick::SetFight
+		)
+	);
+
+	StateChangeActions.Add(
+		EStageState::Reward,
+		FOnStageChangedDelegate::CreateUObject(
+			this, &AABStageGimmick::SetChooseReward
+		)
+	);
+
+	StateChangeActions.Add(
+		EStageState::Next,
+		FOnStageChangedDelegate::CreateUObject(
+			this, &AABStageGimmick::SetChooseNext
+		)
+	);
 }
 
 void AABStageGimmick::OnStageTriggerBeginOverlap(
@@ -115,3 +147,28 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(
 {
 
 }
+
+void AABStageGimmick::SetState(EStageState InNewState)
+{
+	// 현재 상태 업데이트.
+	CurrentState = InNewState;
+
+	// 관련 델리게이트 호출.
+	// 맵에 포함되어 있는지 확인.
+	if (StateChangeActions.Contains(InNewState))
+	{
+		StateChangeActions[InNewState].ExecuteIfBound();
+	}
+}
+
+void AABStageGimmick::SetReady()
+{}
+
+void AABStageGimmick::SetFight()
+{}
+
+void AABStageGimmick::SetChooseReward()
+{}
+
+void AABStageGimmick::SetChooseNext()
+{}
