@@ -28,6 +28,10 @@ public:
 	// Sets default values for this actor's properties
 	AABStageGimmick();
 
+protected:
+	// 액터의 상태가 변경될 때 엔진에서 호출해주는 함수.
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	// 스테이지 관련 변수 및 함수.
 protected:
 	// 스테이지 메시를 보여줄 때 사용할 컴포넌트.
@@ -80,7 +84,7 @@ protected:
 	void SetState(EStageState InNewState);
 
 	// 상태에 따른 처리 분리를 위해 열거형-델리게이트 조합으로 관리.
-	UPROPERTY()
+	//UPROPERTY()
 	TMap<EStageState, FOnStageChangedDelegate> StateChangeActions;
 
 	// 상태 변경에 따른 처리 함수.
@@ -88,4 +92,28 @@ protected:
 	void SetFight();
 	void SetChooseReward();
 	void SetChooseNext();
+
+	// 4개의 문을 열고/닫는 함수.
+	void OpenAllGates();
+	void CloseAllGates();
+
+	// 대전 처리.
+protected:
+	// 캐릭터와 싸울 NPC 캐릭터 클래스 타입.
+	UPROPERTY(EditAnywhere, Category = Fight, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AABCharacterNonPlayer> OpponentClass;
+
+	// NPC 생성하기까지 대기할 시간.
+	UPROPERTY(EditAnywhere, Category = Fight, meta = (AllowPrivateAccess = "true"))
+	float OpponentSpawnTime;
+
+	// NPC가 죽었을 때(Destroy 됐을 때) 발생하는 델리게이트에 등록할 함수.
+	UFUNCTION()
+	void OnOpponentDestroyed(AActor* DestroyedActor);
+
+	// 타이머 핸들.
+	FTimerHandle OpponentTimerHandle;
+
+	// 타이머 종료 후에 NPC 생성에 사용할 함수.
+	void OnOpponentSpawn();
 };
