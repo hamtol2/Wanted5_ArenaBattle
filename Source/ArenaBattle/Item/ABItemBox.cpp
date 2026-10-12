@@ -28,7 +28,7 @@ AABItemBox::AABItemBox()
 	Trigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
 
 	// 박스 컴포넌트의 BeginOverlap 델리게이트에 함수 등록.
-	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
+	//Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
 
 	// 박스 충돌 영역 크기 조정.
 	Trigger->SetBoxExtent(FVector(40.0f, 45.0f, 32.0f));
@@ -68,6 +68,9 @@ AABItemBox::AABItemBox()
 void AABItemBox::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// 박스 컴포넌트의 BeginOverlap 델리게이트에 함수 등록.
+	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AABItemBox::OnOverlapBegin);
 
 	// 애셋 매니저를 통해서 사용할 애셋 목록 가져오기.
 	UAssetManager& Manager = UAssetManager::Get();
