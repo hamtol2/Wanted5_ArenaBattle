@@ -74,7 +74,7 @@ AABStageGimmick::AABStageGimmick()
 		// 게이트 트리거 생성 및 설정.
 		// 예: +XGateTrigger
 		FName TriggerName = *GateSocket.ToString().Append(TEXT("Trigger"));
-		UBoxComponent* GateTrigger 
+		UBoxComponent* GateTrigger
 			= CreateDefaultSubobject<UBoxComponent>(TriggerName);
 
 		// 속성 설정.
@@ -157,11 +157,11 @@ void AABStageGimmick::OnConstruction(const FTransform& Transform)
 }
 
 void AABStageGimmick::OnStageTriggerBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent, 
-	AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, 
-	int32 OtherBodyIndex, 
-	bool bFromSweep, 
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
 	// 스테이지에 진입을 하면 대전(Fight) 상태로 전환.
@@ -169,11 +169,11 @@ void AABStageGimmick::OnStageTriggerBeginOverlap(
 }
 
 void AABStageGimmick::OnGateTriggerBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent, 
-	AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, 
-	int32 OtherBodyIndex, 
-	bool bFromSweep, 
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
 	// 오버랩된 게이트에서 태그 확인.
@@ -208,7 +208,13 @@ void AABStageGimmick::OnGateTriggerBeginOverlap(
 	if (!Result)
 	{
 		// 스테이지 액터 생성.
-		GetWorld()->SpawnActor<AABStageGimmick>(NewLocation, FRotator::ZeroRotator);
+		AABStageGimmick* NewGimmick
+			= GetWorld()->SpawnActor<AABStageGimmick>(
+				NewLocation, FRotator::ZeroRotator
+			);
+
+		// 스테이지 레벨 설정.
+		NewGimmick->SetStageNum(CurrentStageNum + 1);
 	}
 }
 
@@ -335,7 +341,7 @@ void AABStageGimmick::OnOpponentSpawn()
 	);
 
 	// 타입 확인.
-	AABCharacterNonPlayer* ABOpponentCharacter 
+	AABCharacterNonPlayer* ABOpponentCharacter
 		= Cast<AABCharacterNonPlayer>(OpponentActor);
 	if (ABOpponentCharacter)
 	{
@@ -343,15 +349,18 @@ void AABStageGimmick::OnOpponentSpawn()
 		OpponentActor->OnDestroyed.AddDynamic(
 			this, &AABStageGimmick::OnOpponentDestroyed
 		);
+
+		// 현재 스테이지 레벨을 캐릭터 NPC의 레벨로 설정.
+		ABOpponentCharacter->SetLevel(CurrentStageNum);
 	}
 }
 
 void AABStageGimmick::OnRewardTriggerBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent, 
-	AActor* OtherActor, 
-	UPrimitiveComponent* OtherComp, 
-	int32 OtherBodyIndex, 
-	bool bFromSweep, 
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
 	// 캐릭터가 아이템 상자를 습득하면 이 함수가 호출됨.
@@ -385,14 +394,14 @@ void AABStageGimmick::SpawnRewardBoxes()
 	{
 		// 생성 위치.
 		FVector WorldSpawnLoation
-			= GetActorLocation() 
-			+ RewardBoxLocation.Value 
+			= GetActorLocation()
+			+ RewardBoxLocation.Value
 			+ FVector(0.0f, 0.0f, 30.0f);
 
 		// 아이템 상자 액터 생성.
 		AActor* ItemActor = GetWorld()->SpawnActor(
-			RewardBoxClass, 
-			&WorldSpawnLoation, 
+			RewardBoxClass,
+			&WorldSpawnLoation,
 			&FRotator::ZeroRotator
 		);
 

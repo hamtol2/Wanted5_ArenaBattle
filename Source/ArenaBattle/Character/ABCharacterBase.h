@@ -36,6 +36,11 @@ public:
 	// Sets default values for this character's properties
 	AABCharacterBase();
 
+	// 스탯.
+public:
+	int32 GetLevel() const;
+	void SetLevel(int32 InNewLevel);
+
 protected:
 
 	// 컴포넌트 초기화가 끝났을 때 호출되는 함수
