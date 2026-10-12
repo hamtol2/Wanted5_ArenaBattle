@@ -463,7 +463,7 @@ void AABCharacterBase::AttackHitCheck()
 	if (HitDetected)
 	{
 		// 전달할 대미지.
-		const float AttackDamage = 30.0f;
+		const float AttackDamage = 100.0f;
 
 		// 대미지 이벤트 변수.
 		FDamageEvent DamageEvent;
