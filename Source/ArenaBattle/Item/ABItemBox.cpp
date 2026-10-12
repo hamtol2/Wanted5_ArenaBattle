@@ -2,12 +2,14 @@
 
 
 #include "Item/ABItemBox.h"
+#include <Item/ABItemData.h>
 #include <Physics/ABCollision.h>
 #include <Interface/ABCharacterItemInterface.h>
 
 #include <Components/BoxComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <Particles/ParticleSystemComponent.h>
+#include <Engine/AssetManager.h>
 
 // Sets default values
 AABItemBox::AABItemBox()
@@ -61,6 +63,39 @@ AABItemBox::AABItemBox()
 		// 바로 재생하지 않도록 설정.
 		Effect->bAutoActivate = false;
 	}
+}
+
+void AABItemBox::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	// 애셋 매니저를 통해서 사용할 애셋 목록 가져오기.
+	UAssetManager& Manager = UAssetManager::Get();
+	
+	// 설정한 애셋 태그를 활용해 애셋 목록 가져오기.
+	TArray<FPrimaryAssetId> Assets;
+	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
+
+	// 확인.
+	ensureAlways(Assets.Num() > 0);
+
+	// 랜덤으로 선택.
+	int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
+
+	// 선택된 인덱스로 접근해서 애셋 참조.
+	FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
+
+	// 애셋 로드 - 로드되지 않은 애셋 로드.
+	if (AssetPtr.IsPending())
+	{
+		AssetPtr.LoadSynchronous();
+	}
+
+	// 로드한 애셋을 기반으로 아이템 데이터 설정.
+	Item = Cast<UABItemData>(AssetPtr.Get());
+
+	// 확인 - 아이템 값이 제대로 설정됐는지.
+	ensureAlways(Item);
 }
 
 void AABItemBox::OnOverlapBegin(
