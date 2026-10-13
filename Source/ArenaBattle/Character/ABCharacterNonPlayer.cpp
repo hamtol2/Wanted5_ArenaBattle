@@ -116,10 +116,28 @@ float AABCharacterNonPlayer::GetAIAttackRange()
 
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
-	return 0.0f;
+	return 2.0f;
 }
 
 void AABCharacterNonPlayer::AttackByAI()
 {
+	// 공격 실행.
+	ProcessComboCommand();
 
+	// 공격 끝나는 시점을 알 필요가 있음.
+}
+
+void AABCharacterNonPlayer::SetAIAttackDelegate(
+	const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	// 델리게이트에 전달된 로직 저장.
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AABCharacterNonPlayer::NotifyComboActionEnd()
+{
+	Super::NotifyComboActionEnd();
+
+	// 공격 종료를 알리는 델리게이트 호출.
+	OnAttackFinished.ExecuteIfBound();
 }

@@ -90,6 +90,9 @@ protected:
 	// 몽타주 재생 종료 시 호출할 함수 (델리게이트와 연동).
 	void ComboActionEnded(UAnimMontage* TargetMontage, bool bInterrupted);
 
+	// 공격이 끝나는 시점에 호출할 함수 (메시지 전달용).
+	virtual void NotifyComboActionEnd() { }
+
 	// 콤보 타이머 설정 함수.
 	void SetComboCheckTimer();
 

@@ -45,4 +45,13 @@ protected:
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
 	virtual void AttackByAI() override;
+	virtual void SetAIAttackDelegate(
+		const FAICharacterAttackFinished& InOnAttackFinished
+	) override;
+
+	// 공격 끝나는 시점에 호출되는 함수 오버라이드.
+	virtual void NotifyComboActionEnd() override;
+
+	// 공격 종료 시에 호출할 델리게이트.
+	FAICharacterAttackFinished OnAttackFinished;
 };

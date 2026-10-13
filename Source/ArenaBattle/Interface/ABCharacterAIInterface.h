@@ -13,6 +13,9 @@ class UABCharacterAIInterface : public UInterface
 	GENERATED_BODY()
 };
 
+// 공격 종료 시에 호출할 델리게이트 선언.
+DECLARE_DELEGATE(FAICharacterAttackFinished);
+
 /**
  * 
  */
@@ -31,4 +34,9 @@ public:
 
 	// AI를 통해 공격 메시지를 전달할 때 사용할 함수.
 	virtual void AttackByAI() = 0;
+
+	// 캐릭터에 델리게이트를 전달할 때 사용할 함수.
+	virtual void SetAIAttackDelegate(
+		const FAICharacterAttackFinished& InOnAttackFinished
+	) = 0;
 };
