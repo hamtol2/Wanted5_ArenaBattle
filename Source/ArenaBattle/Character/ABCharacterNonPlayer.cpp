@@ -96,3 +96,23 @@ void AABCharacterNonPlayer::NPCMeshLoadCompleted()
 	// 사용한 핸들 해제.
 	NPCMeshHandle->ReleaseHandle();
 }
+
+float AABCharacterNonPlayer::GetAIPatrolRadius()
+{
+	return 500.0f;
+}
+
+float AABCharacterNonPlayer::GetAIDetectRange()
+{
+	return 0.0f;
+}
+
+float AABCharacterNonPlayer::GetAIAttackRange()
+{
+	return 0.0f;
+}
+
+float AABCharacterNonPlayer::GetAITurnSpeed()
+{
+	return 0.0f;
+}
