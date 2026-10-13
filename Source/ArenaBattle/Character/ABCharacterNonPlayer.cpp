@@ -3,6 +3,7 @@
 
 #include "Character/ABCharacterNonPlayer.h"
 #include <AI/ABAIController.h>
+#include <CharacterStat/ABCharacterStatComponent.h>
 #include <Engine/AssetManager.h>
 
 AABCharacterNonPlayer::AABCharacterNonPlayer()
@@ -109,10 +110,16 @@ float AABCharacterNonPlayer::GetAIDetectRange()
 
 float AABCharacterNonPlayer::GetAIAttackRange()
 {
-	return 0.0f;
+	// 스탯의 공격 거리 + 공격 반경을 지름으로 계산해서 최종 공격 가능 거리 판단.
+	return Stat->GetTotalStat().AttackRange + Stat->GetAttackRadius() * 2.0f;
 }
 
 float AABCharacterNonPlayer::GetAITurnSpeed()
 {
 	return 0.0f;
+}
+
+void AABCharacterNonPlayer::AttackByAI()
+{
+
 }

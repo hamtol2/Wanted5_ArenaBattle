@@ -443,7 +443,8 @@ void AABCharacterBase::AttackHitCheck()
 	const float AttackRange = Stat->GetTotalStat().AttackRange;
 
 	// 트레이스에 사용할 구체의 반지름.
-	const float AttackRadius = 50.0f;
+	//const float AttackRadius = 50.0f;
+	const float AttackRadius = Stat->GetAttackRadius();
 
 	// 트레이스 시작 위치.
 	// 액터의 위치 + 캡슐 높이의 반지름 만큼 앞으로 떨어진 위치.

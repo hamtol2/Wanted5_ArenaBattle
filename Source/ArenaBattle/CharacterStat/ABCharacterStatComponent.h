@@ -48,6 +48,9 @@ public:
 
 	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
 
+	// 공격 반경 반환.
+	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
+
 	// 대미지 적용 함수(Setter).
 	float ApplyDamage(float InDamage);
 
@@ -76,6 +79,10 @@ protected:
 	// 캐릭터 레벨.
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	int32 CurrentLevel;
+
+	// 공격 반경.
+	UPROPERTY(VisibleInstanceOnly, Category = Stat)
+	float AttackRadius;
 
 	// 캐릭터의 기본 스탯 데이터.
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
