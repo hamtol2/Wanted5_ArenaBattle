@@ -10,6 +10,10 @@ UABCharacterStatComponent::UABCharacterStatComponent()
 	//MaxHp = 200.0f;
 	//SetHp(MaxHp);
 
+	// bWantsInitializeComponent 값을 true로 설정해야 
+	// InitializeComponent 함수가 호출됨.
+	bWantsInitializeComponent = true;
+
 	// 현재 레벨 설정.
 	CurrentLevel = 1;
 
@@ -17,12 +21,10 @@ UABCharacterStatComponent::UABCharacterStatComponent()
 	AttackRadius = 50.0f;
 }
 
-// Called when the game starts
-void UABCharacterStatComponent::BeginPlay()
+void UABCharacterStatComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
-	//SetHp(MaxHp);
 	SetLevelStat(CurrentLevel);
 	SetHp(BaseStat.MaxHp);
 }
