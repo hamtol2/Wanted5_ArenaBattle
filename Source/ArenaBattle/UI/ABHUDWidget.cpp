@@ -29,9 +29,9 @@ void UABHUDWidget::UpdateHpBar(float NewCurrentHp)
 	HpBar->UpdateHpBar(NewCurrentHp);
 }
 
-void UABHUDWidget::NativeOnInitialized()
+void UABHUDWidget::NativeConstruct()
 {
-	Super::NativeOnInitialized();
+	Super::NativeConstruct();
 
 	// HUD에서 이름으로 위젯 검색.
 	HpBar = Cast<UABHpBarWidget>(GetWidgetFromName(TEXT("WidgetHpBar")));
