@@ -3,6 +3,8 @@
 
 #include "Character/ABCharacterPlayer.h"
 #include "ABCharacterControlData.h"
+#include <UI/ABHUDWidget.h>
+#include <CharacterStat/ABCharacterStatComponent.h>
 
 #include <GameFramework/SpringArmComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
@@ -341,4 +343,21 @@ void AABCharacterPlayer::ChangeCharacterControl()
 void AABCharacterPlayer::Attack()
 {
 	ProcessComboCommand();
+}
+
+void AABCharacterPlayer::SetupHUDWidget(UABHUDWidget* InHUDWidget)
+{
+	// 값 확인.
+	if (nullptr == InHUDWidget)
+	{
+		return;
+	}
+
+	// 스탯 정보를 UI에 전달.
+	InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+	InHUDWidget->UpdateHpBar(Stat->GetCurrentHp());
+
+	// 델리게이트 등록 처리.
+	Stat->OnStatChanged.AddUObject(InHUDWidget, &UABHUDWidget::UpdateStat);
+	Stat->OnHpChanged.AddUObject(InHUDWidget, &UABHUDWidget::UpdateHpBar);
 }
