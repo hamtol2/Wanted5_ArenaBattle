@@ -16,6 +16,8 @@ class ARENABATTLE_API UABWeaponItemData : public UABItemData
 	GENERATED_BODY()
 	
 public:
+	UABWeaponItemData();
+
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{
 		return FPrimaryAssetId("ABItemData", GetFName());

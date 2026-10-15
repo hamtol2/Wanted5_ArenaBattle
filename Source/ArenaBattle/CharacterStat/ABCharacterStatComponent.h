@@ -51,6 +51,15 @@ public:
 		OnStatChanged.Broadcast(BaseStat, ModifierStat);
 	}
 
+	// 기본 스탯을 더해주는 처리 함수.
+	FORCEINLINE void AddBaseStat(const FABCharacterStat& InAddBaseStat)
+	{
+		BaseStat = BaseStat + InAddBaseStat;
+
+		// 스탯 변경 이벤트 발행.
+		OnStatChanged.Broadcast(BaseStat, ModifierStat);
+	}
+
 	// 부가 스탯 데이터 설정 함수.
 	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat)
 	{
@@ -70,6 +79,16 @@ public:
 	}
 
 	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
+
+	// HP를 회복시킬 때 사용할 함수.
+	FORCEINLINE void HealHp(float InHealAmount)
+	{
+		// 현재 HP에 회복량만큼 더해주기.
+		CurrentHp = FMath::Clamp(CurrentHp + InHealAmount, 0, GetTotalStat().MaxHp);
+
+		// 델리게이트 호출 (HP 변경 이벤트).
+		OnHpChanged.Broadcast(CurrentHp);
+	}
 
 	// 공격 반경 반환.
 	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
