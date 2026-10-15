@@ -151,6 +151,9 @@ void AABCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	// 기본 스탯의 이동 속도 설정.
+	ApplyStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+
 	// 델리게이트에 함수 등록.
 	Stat->OnHpZero.AddUObject(this, &AABCharacterBase::SetDead);
 
@@ -296,13 +299,19 @@ void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
 	{
 		// 데이터 설정.
 		//HpBarWidget->SetMaxHp(Stat->GetMaxHp());
-		HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
+		//HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
+		HpBarWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 
 		// 델리게이트 등록.
 		Stat->OnHpChanged.AddUObject(
 			HpBarWidget,
 			&UABHpBarWidget::UpdateHpBar
+		);
+
+		Stat->OnStatChanged.AddUObject(
+			HpBarWidget,
+			&UABHpBarWidget::UpdateStat
 		);
 	}
 }
