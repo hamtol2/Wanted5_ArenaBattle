@@ -9,6 +9,9 @@
 // 전방 선언.
 class UABHUDWidget;
 
+// 로그 카테고리 추가.
+DECLARE_LOG_CATEGORY_EXTERN(LogABPlayerController, Log, All);
+
 /**
  * 
  */
@@ -40,6 +43,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Game, meta = (DisplayName = "OnGameOverCpp"))
 	void K2_OnGameOver();
+
+	// 게임 재시작 횟수가 변경되면 사용할 이벤트.
+	UFUNCTION(BlueprintImplementableEvent, Category = Game, meta = (DisplayName = "OnGameRetryCountCpp"))
+	void K2_OnGameRetryCount(int32 NewRetryCount);
 	
 private:
 	virtual void BeginPlay() override;
@@ -52,4 +59,9 @@ protected:
 	// 생성한 위젯을 저장할 변수.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = HUD)
 	TObjectPtr<UABHUDWidget> ABHUDWidget;
+
+	// SaveGame 섹션.
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SaveGame)
+	TObjectPtr<class UABSaveGame> SaveGameInstance;
 };

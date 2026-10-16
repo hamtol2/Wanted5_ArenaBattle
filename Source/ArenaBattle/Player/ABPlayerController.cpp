@@ -2,7 +2,11 @@
 
 
 #include "Player/ABPlayerController.h"
+#include "ABSaveGame.h"
 #include <UI/ABHUDWidget.h>
+#include <Kismet/GameplayStatics.h>
+
+DEFINE_LOG_CATEGORY(LogABPlayerController);
 
 AABPlayerController::AABPlayerController()
 {
@@ -32,6 +36,15 @@ void AABPlayerController::GameClear()
 void AABPlayerController::GameOver()
 {
 	K2_OnGameOver();
+
+	// 게임이 끝나면 세이브 게임 객체를 활용해 데이터 저장.
+	if (false == UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
+	{
+		UE_LOG(LogABPlayerController, Error, TEXT("Save Game Error!!"));
+	}
+
+	// 게임이 종료되면 재시도 횟수가 증가하고 이를 알 수 있게 이벤트 실행.
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
 }
 
 void AABPlayerController::BeginPlay()
@@ -41,6 +54,26 @@ void AABPlayerController::BeginPlay()
 	// 입력 설정.
 	FInputModeGameOnly GameOnlyInputMode;
 	SetInputMode(GameOnlyInputMode);
+
+	// 게임이 시작되면 저장된 게임이 있는지 확인 및 로드.
+	SaveGameInstance 
+		= Cast<UABSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"), 0));
+
+	// 이미 저장된 게임이 있으면 객체가 null이 아님.
+	if (nullptr != SaveGameInstance)
+	{
+		// 재시도 횟수 증가 처리.
+		++SaveGameInstance->RetryCount;
+	}
+
+	else
+	{
+		// 저장된 게임이 없으면 새로 생성.
+		SaveGameInstance = NewObject<UABSaveGame>();
+	}
+
+	// 게임을 시작할 때 재시도 횟수 정보를 알 수 있게 호출.
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
 
 	// 위젯 생성.
 	//ABHUDWidget = CreateWidget<UABHUDWidget>(this, ABHUDWidgetClass);

@@ -22,6 +22,12 @@ void AABGameMode::OnPlayerScoreChanged(int32 NewPlayerScore)
 	// 현재 점수를 전달받은 값으로 업데이트.
 	CurrentScore = NewPlayerScore;
 
+	// 게임 클리어 여부 확인.
+	if (CurrentScore >= ClearScore)
+	{
+		bIsCleared = true;
+	}
+
 	// 플레이어 컨트롤러에게 플레이어 점수가 업데이트 되었다는 걸 알리기.
 	// 기본적으로 플레이어 컨트롤러는 "플레이어"의 수 만큼 생성됨.
 	// 하지만 싱글 플레이어 게임의 경우 "플레이어(게이머)"가 1개임.
@@ -31,14 +37,9 @@ void AABGameMode::OnPlayerScoreChanged(int32 NewPlayerScore)
 	{
 		// 게임 점수가 변경된 사실을 알리기.
 		ABPlayerController->GameScoreChanged(CurrentScore);
-	}
 
-	// 게임 클리어 여부 확인.
-	if (CurrentScore >= ClearScore)
-	{
-		bIsCleared = true;
-
-		if (nullptr != ABPlayerController)
+		// 게임 클리어 여부 확인.
+		if (bIsCleared)
 		{
 			ABPlayerController->GameClear();
 		}
