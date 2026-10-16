@@ -26,6 +26,7 @@ protected:
 	virtual void OnPlayerScoreChanged(int32 NewPlayerScore) override;
 	virtual void OnPlayerDead() override;
 	virtual bool IsGameCleared() override;
+	virtual int32 GetClearScore() override;
 
 public:
 	// 게임을 클리어하기 위한 조건 (점수).
