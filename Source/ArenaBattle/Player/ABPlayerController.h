@@ -19,6 +19,11 @@ class ARENABATTLE_API AABPlayerController : public APlayerController
 
 public:
 	AABPlayerController();
+
+	// 게임 처리와 관련된 함수.
+	void GameScoreChanged(int32 NewScore);
+	void GameClear();
+	void GameOver();
 	
 private:
 	virtual void BeginPlay() override;

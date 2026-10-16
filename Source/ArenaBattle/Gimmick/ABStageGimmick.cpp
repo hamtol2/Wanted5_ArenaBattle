@@ -5,10 +5,12 @@
 #include <Physics/ABCollision.h>
 #include <Character/ABCharacterNonPlayer.h>
 #include <Item/ABItemBox.h>
+#include <Interface/ABGameInterface.h>
 
 #include <Components/StaticMeshComponent.h>
 #include <Components/BoxComponent.h>
 #include <Engine/OverlapResult.h>
+#include <GameFramework/GameModeBase.h>
 
 // Sets default values
 AABStageGimmick::AABStageGimmick()
@@ -329,6 +331,22 @@ void AABStageGimmick::CloseAllGates()
 
 void AABStageGimmick::OnOpponentDestroyed(AActor* DestroyedActor)
 {
+	// 게임 모드에 접근해서 점수 획득 요청.
+	// 게임 모드에 직접 접근하지 않고, 인터페이스를 통해서 간접 접근.
+	IABGameInterface* ABGameMode
+		= Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
+	if (nullptr != ABGameMode)
+	{
+		// 플레이어 점수 업데이트.
+		ABGameMode->OnPlayerScoreChanged(CurrentStageNum);
+
+		// 게임 클리어 여부 확인.
+		if (ABGameMode->IsGameCleared())
+		{
+			return;
+		}
+	}
+
 	// NPC가 죽으면 보상 단계로 전환.
 	SetState(EStageState::Reward);
 }
